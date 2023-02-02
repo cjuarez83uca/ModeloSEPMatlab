@@ -18,8 +18,8 @@ while y(r)<1.0001
 end
 tiempo_subida=(r - 1)*h;
 % Tiempo pico y sobreenlongación
-[ymax,tp]=max(y);
-tiempo_pico=(tp - 1)*h;
+[ymax,idx_tp]=max(y);
+tiempo_pico=(idx_tp - 1)*h;
 sobreelongacion_max=ymax-1;
 
 % tiempo de establecimiento

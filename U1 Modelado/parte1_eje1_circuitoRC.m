@@ -1,37 +1,50 @@
-% Constantes del circuitoRC
-R=10;
-C=0.01e-3;
+% parte1_eje1_circuitoRC.m
+% Este programa simula un sistema RC sin fuentes.
+
+% Datos físicos (Parámetros)
+R = 10; % ohms
+C = 1e-3; %faradios
 tau=R*C;
 
-% condiciones iniciales
-Vo=1;
 
-% discretización del tiempo
-h=0.05e-4;
-t=0:h:5*tau;
+% EDO orden 1 --> 1 Condiciones iniciales 
+Vo=1; % volt
 
-% cálculo del V capacitor (teoría)
-Vc=Vo*exp(-t/tau);
+% discretización de la variable independiente
+% tiempo
+h=1e-3; % paso de tiempo.
+tfinal=5*tau; % tiempo simulación.
+t=0:h:tfinal;
 
-% graficando
-plot(t,Vc)
-title('Comportamiento del voltaje del Capacitor')
-xlabel('tiempo [s]')
-ylabel('voltaje [V]')
+% Tensión del capacitor
+% Valor teórico
+Vteorico=Vo*exp(-t/(R*C));
 
-% Inicializando variables
-Vaprox=zeros(length(t),1);
+%Gráfica de la tensión teórica.
+figure
+plot(t,Vteorico,'b')
+title('Comportamiento de la tensión en sistema RC sin fuentes')
+xlabel('Tiempo (s)')
+ylabel('Tensión (v)')
 
-% condiciones iniciales
+
+
+% simulación numérica
+% inicialización variable salida.
+Vaprox=zeros(1,length(t));
+
+% Condición inicial t=0;
 Vaprox(1)=Vo;
 
-% solucionando por métodos numéricos
 for i=1:length(t)-1
-    Vaprox(i+1)=Vaprox(i)+h*(-1/R/C*Vaprox(i));
+    Vaprox(i+1)=Vaprox(i)+h*(-1/(R*C)*Vaprox(i));
 end
-hold on % mantiene lo graficado
-plot(t,Vaprox);
-hold off % ya no mantiene lo graficado.
+
+hold on % para mantener la gráfica anterior.
+plot(t,Vaprox,'r')
+
+legend('Valor téorica','Valor aproximado')
+
 
 
 

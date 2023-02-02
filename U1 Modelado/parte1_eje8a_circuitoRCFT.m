@@ -7,12 +7,13 @@ tau=R*C;
 % Función de Transferencia
 num=[1];
 den=[tau 1];
-sys=tf(num,den);
+sys=tf(num,den); % calcula una función de transferencia
 % respuesta al escalón
 step(sys);
 grid on % grilla
+
 % graficando línea recta pendiente 1/tau
-hold on
+hold on % mantener
 t=0:tau/10:tau;
 plot(t,(1/tau)*t,'r')
 

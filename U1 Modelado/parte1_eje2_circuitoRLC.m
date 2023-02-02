@@ -1,35 +1,32 @@
-% circuto RLC - Serie
+% parte1_eje2_circutioRLC.m
+% Resuleve tensión del capacitor en un sistema RLC Serie
 
-% Datos del sistema:
-R= 10000;
-C= 0.1e-3;
-L= 30;
+%constantes del sistema:
+R=10;
+C=0.1e-3;
+L=30;
+
+p1=-R/(2*L)+sqrt(R^2/4/L^2-1/L/C);
+p2=-R/(2*L)-sqrt(R^2/4/L^2-1/L/C);
+
+% Sistema de ecuaciones diferenciales
+% dx1=x2
+% dx2=-R/L*x2 -1/(LC)*x1
+f=@(t,x)[x(2);-R/L*x(2)-1/(L*C)*x(1)];
+
+% dx1=-R/L*x1 -1/(LC)*x2
+% dx2=x1
+% f2=@(t,x)[-R/L*x(1)-1/(L*C)*x(2);x(1)];
 
 % condiciones iniciales
-Vc0=10;
-pVc0=0;
+vc0=1;
+dvc0=0;
 
-% Datos del tiempo
-h=0.1/10;
-ti=0;
-tf=1;
-t=ti:h:tf;
-% Solución analítica
-p1=-R/2/L+sqrt(R^2/4/L^2-1/L/C);
-p2=-R/2/L-sqrt(R^2/4/L^2-1/L/C);
+% tiempo final de simulación
+tfin=10;
 
-A1=(Vc0*p2-pVc0)/(p2-p1);
-A2=(pVc0-Vc0*p1)/(p2-p1);
-
-Vc=A1*exp(p1*t)+A2*exp(p2*t);
-plot(t,Vc)
-title('Voltaje de capacitor en Ckto RLC')
-xlabel('Tiempo [s]')
-ylabel('Voltaje [V]')
+[t,xsol]=ode45(f,[0 tfin],[vc0 dvc0]);
+figure
+plot(t,xsol(:,1))
 
 
-% Solución método numérico
-[tm,xm]=ode45(odefun,[ti tf],[Vc0 pVc0]);
-hold on
-plot(tm,xm(:,1));
-hold off
