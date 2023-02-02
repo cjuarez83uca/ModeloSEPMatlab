@@ -12,10 +12,14 @@ G=tf(num,den); % creando función de transferencia
 % Respuesta al escalón
 [x1,t1]=step(G,10);
 
+figure
 plot(t1,x1)
+title('G(s)= 20/(s+10)(s^2+2s+2)')
 
+%polos de G(s)
+polosG=roots(den)
 
-% Eliminando cero
+% Eliminando polo en -10
 G1=tf(20,p2); % creando función de transferencia 
 % Respuesta al escalón
 [x2,t2]=step(G1,10);
