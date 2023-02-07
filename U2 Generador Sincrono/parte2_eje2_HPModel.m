@@ -1,74 +1,52 @@
-
-% Heffron phillips model 
-
-S=555; % Potencia nominal del generador
-
-
-xd=1.81; % reactancia en eje directo en pu
-
-xpd=0.3; % reactancia transitoria en eje directo en pu
-xq=1.76; % reactancia en eje cuadratura en pu
-tpdo=8; % Tiempo transitorio
-ra=0.003; % resistencia de Armadura
-xl=0.16;
-H=3.5; % Inercia
-Kd=10; % Amortiguamiento
-F=60; % frecuencia del sistema.
-
-FP=0.9; % factor de potencia
-
+% Calculo condiciones iniciales
+% datos de la maquina xd, xpd, xq, tpdo, 
+% ra: resistencia de armadura, 
+% eb= tension en pu en barra infinita
+% H= constante de inercia
+% F= fcia en Hz, 
+% P, Q estado de carga, 
+% xe: reactancia externa, 
+% vto: tensi´on en terminales pu [0.95;1.;1.05]
+% D: amortiguamiento en =0
 P=0.9;
 Q=0.3;
+xd=1.8;%reactancia de eje directo
+xpd=0.3;%reactancia transitoria de eje directo
+xq=1.7;%reactancia de eje en cuadratura
+tpdo=8.0;%constante de tiempo de eje de cuadratura en eje directo
+ra=0.003;%resistencia de armadura
+H1=6.5;%constante de tiempo
+KD=0;%amortiguamiento?
+F=60;%frecuencia del sistema
 
-xe=0.65; % reactancia externa
+% tension en barra infinita
+eb=1;
 
-Et=1; % voltaje en terminales.
-Eb=0.995; % tensión en barra infinita.
+% tension en terminales
+vto=1.03;%%
 
-tho= asin(P*xe/(Eb*Et));% angulo de desfase entre Eb y Et
+% reactancia externa
+xe=0.4;
 
-%Estado de operación
-Vto=Et*(cos(tho)+1i*sin(tho)); % tensión en terminales (compleja)
 
-Ia=(P-1i*Q)/(conj(Vto)); % Corriente armadura (compleja)
-ia=abs(Ia); % Imax
-fio=angle(Ia);% desfase 
 
-Eqo=Vto+(ra+xq*1i)*Ia; % tensión en cudratura del generador.
-eqo=abs(Eqo); % eq
-do=angle(Eqo); % desfase 
 
-ido=-ia*sin(do-fio);  % id
-iqo=ia*cos(do-fio); % iq
 
-efdo=eqo-(xd-xq)*ido; % tensión de campo
-
-vqo=Eb*cos(do)+ra*iqo-xe*ido; %vq terminales
-vdo=ra*iqo+xe*iqo-Eb*sin(do); %vd terminales
-
-wb=2*pi*F; % frecuencia base.
-
+tho=asin(P*xe/(eb*vto));%Ver ecuacion 12.70 (Kundur, pagina 729)corresponde a delta en dicha figura
+Vto=vto*(cos(tho)+i*sin(tho));Ia=(P-i*Q)/(conj(Vto));ia=abs(Ia);fio=angle(Ia);
+Eqo=Vto+(ra+xq*i)*Ia; eqo=abs(Eqo); do=angle(Eqo);
+ido=-ia*sin(do-fio); iqo=ia*cos(do-fio);
+efdo=eqo-(xd-xq)*ido; vqo=eb*cos(do)+ra*iqo-xe*ido; vdo=ra*iqo+xe*iqo-eb*sin(do);
+wb=2*pi*F;
 % Calculo de k1 a k6
-RT=ra;
-XTQ=xe+xq;
-XTD=xe+xpd;
-D=RT^2+XTQ*XTD;
-Ksat=0.83;
-Ladu=xd-xl;
-Laqu=xq-xl;
-Lads=Ksat*Ladu;
-Laqs=Ksat*Laqu;
-Lfd= ((xpd-xl)*Ladu)/(Ladu-(xpd-xl));
-Ks=(Eb*Eqo)/(xd+xe)*cos(tho);
-K1=Eb*eqo/D*(RT*sin(do)+XTD*cos(do))+Eb*iqo/D*(xq-xpd)*(XTQ*sin(do)-RT*cos(do));
-K2=Lads/(Lads+Lfd)*(RT/D*eqo+(XTQ*(xq-xpd)/D+1)*iqo);
-
-
-K3=(Lads+Lfd)/Ladu*1/(1+XTQ/D*(xd+xpd));
-K4=Eb/D*(xd-xpd)*(XTQ*sin(do)-RT*cos(do));
-K5=-(vdo/Et)*xq*Eb*cos(do)/(xe+xq)-(vqo/Et)*xpd*Eb*sin(do)/(xe+xpd);
-K6=xe*(vqo/Et)/(xe+xpd);
-K7=K2/K6;
-
-
-T3=K3*tpdo;
+k1=((xq-xpd)/(xe+xpd))*iqo*eb*sin(do)+eqo*eb*cos(do)/(xe+xq);
+k2=eb*sin(do)/(xe+xpd);
+k3=(xe+xpd)/(xd+xe);
+k4=(xd-xpd)*sin(do)*eb/(xpd+xe);
+k5=-(vdo/vto)*xq*eb*cos(do)/(xe+xq)-(vqo/vto)*xpd*eb*sin(do)/(xe+xpd);
+k6=xe*(vqo/vto)/(xe+xpd);
+k7=k2/k6;
+T3=tpdo/(1+XTQ/D*(xd-xpd));
+% Calculo de K1 a K6
+K=[k1,k2,k3,k4,k5,k6,k7];
+C=[H,F,tpdo,tho];
