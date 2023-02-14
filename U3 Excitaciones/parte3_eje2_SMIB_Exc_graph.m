@@ -1,3 +1,6 @@
+clear all
+close all
+clc
 
 % Heffron phillips model 
 
@@ -30,20 +33,13 @@ tho= asin(P*xe/(Eb*Et));% angulo de desfase entre Eb y Et
 %Estado de operación
 Vto=Et*(cos(tho)+1i*sin(tho)); % tensión en terminales (compleja)
 
-It=(P-1i*Q)/(conj(Vto)); % Corriente armadura (compleja)
-it=abs(It); % Imax
+Ia=(P-1i*Q)/(conj(Vto)); % Corriente armadura (compleja)
+ia=abs(Ia); % Imax
 fio=angle(Ia);% desfase 
-Ksat=0.83;
-pfi=angle(P+1j*Q);
-Xds=Ksat*xd+xl;
-Xqs=Ksat*xq+xl;
-di=atan((it*Xqs*cos(pfi)-it*ra*sin(pfi))/(Et+it*ra*cos(pfi)+it*Xqs*sin(pfi)));
-ed0=Et*sin(di);
-eq0=Et*cos(di);
-E=Vto+(ra+xq*1i)*Ia; % tensión del generador.
-eqo=imag(E); % eq
-edo=real(E);
-do=angle(E); % desfase 
+
+Eqo=Vto+(ra+xq*1i)*Ia; % tensión en cudratura del generador.
+eqo=abs(Eqo); % eq
+do=angle(Eqo); % desfase 
 
 ido=-ia*sin(do-fio);  % id
 iqo=ia*cos(do-fio); % iq
@@ -60,7 +56,7 @@ RT=ra;
 XTQ=xe+xq;
 XTD=xe+xpd;
 D=RT^2+XTQ*XTD;
-
+Ksat=0.83;
 Ladu=xd-xl;
 Laqu=xq-xl;
 Lads=Ksat*Ladu;
@@ -68,16 +64,6 @@ Laqs=Ksat*Laqu;
 Lfd= ((xpd-xl)*Ladu)/(Ladu-(xpd-xl));
 Ks=(Eb*Eqo)/(xd+xe)*cos(tho);
 K1=Eb*eqo/D*(RT*sin(do)+XTD*cos(do))+Eb*iqo/D*(xq-xpd)*(XTQ*sin(do)-RT*cos(do));
-
-
-Lpads=1/((1/Lads)+(1/Lfd));
-psiaq0=-edo-ra*ido+xl*iqo;
-psiad0=eqo+ra*iqo+xl*ido;
-m1=Eb*(XTQ*sin(do)-RT*cos(do))/D;
-n1=Eb*(RT*sin(do)-XTD*cos(do))/D;
-
-K1c=n1*(psiad0+Laqs*ido)-m1*(psiaq0+Lpads*iqo);
-
 K2=Lads/(Lads+Lfd)*(RT/D*eqo+(XTQ*(xq-xpd)/D+1)*iqo);
 
 
@@ -89,3 +75,39 @@ K7=K2/K6;
 
 
 T3=K3*tpdo;
+
+% transductor
+Tr=0.01;
+
+% excitatriz
+KA=1000;
+TA=0.1;
+T1a=100;
+T2a=100;
+Tee=0.1;
+
+parte3_eje1_SMIB_Exc
+sim('parte3_eje1_SMIB_Exc')
+
+% Función de transferencia de Lazo Abierto:
+% sim('parte3_eje2_SMIB_Exc')
+[A,B,C,D]=linmod('parte3_eje2_SMIB_Exc');
+[Num,Den]=ss2tf(A,B,C,D);
+sys_ol=tf(Num,Den)
+
+% Bode
+margin(sys_ol)
+
+
+% funcion de transferencia lazo cerrado:
+
+[A,B,C,D]=linmod('parte3_eje3_SMIB_Exc');
+[Num,Den]=ss2tf(A,B,C,D);
+sys_cl=tf(Num,Den)
+
+figure
+% Bode
+bode(sys_cl)
+grid on
+
+% 
