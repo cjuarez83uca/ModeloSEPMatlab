@@ -18,8 +18,18 @@ H=3.5; % Inercia
 Kd=10; % Amortiguamiento
 F=60; % frecuencia del sistema.
 
-FP=0.9; % factor de potencia
 
+
+% Inductancias. 
+Ladu=xd-xl;
+Laqu=xq-xl;
+Ksd=0.8491;Ksq=0.8491;
+Xds=Ksd*Ladu+xl;
+Xqs=Ksq*Laqu+xl;
+
+
+% datos del generador. 
+FP=0.9; % factor de potencia
 P=0.9;
 Q=0.3;
 
@@ -32,46 +42,39 @@ tho= asin(P*xe/(Eb*Et));% angulo de desfase entre Eb y Et
 
 %Estado de operación
 Vto=Et*(cos(tho)+1i*sin(tho)); % tensión en terminales (compleja)
+  
+Ito=conj(P+1i*Q)/(conj(Vto)); % Corriente armadura (compleja)
+fio=angle(Ito);% desfase 
+it=abs(Ito); % Imax
+di=atan((it*Xqs*cos(fio)-it*ra*sin(fio))/(Et+it*ra*cos(fio)+it*Xqs*sin(fio)))
 
-Ia=(P-1i*Q)/(conj(Vto)); % Corriente armadura (compleja)
-ia=abs(Ia); % Imax
-fio=angle(Ia);% desfase 
+edo=Et*sin(di);
+eqo=Et*cos(di);
 
-Eqo=Vto+(ra+xq*1i)*Ia; % tensión en cudratura del generador.
-eqo=abs(Eqo); % eq
-do=angle(Eqo); % desfase 
+ido=it*sin(di+fio);
+iqo=it*cos(di+fio);
 
-ido=-ia*sin(do-fio);  % id
-iqo=ia*cos(do-fio); % iq
+EBd0=edo+xe*iqo;
+EBq0=eqo-xe*ido;
 
-efdo=eqo-(xd-xq)*ido; % tensión de campo
+EB=sqrt(EBq0^2+EBd0^2);
 
-vqo=Eb*cos(do)+ra*iqo-xe*ido; %vq terminales
-vdo=ra*iqo+xe*iqo-Eb*sin(do); %vd terminales
+do=atan(EBd0/EBq0);
 
-wb=2*pi*F; % frecuencia base.
+ifdo=(eqo+ra*iqo+Xds*ido)/(Ladu*Ksd);
 
-% Calculo de k1 a k6
-RT=ra;
-XTQ=xe+xq;
-XTD=xe+xpd;
-D=RT^2+XTQ*XTD;
-Ksat=0.83;
-Ladu=xd-xl;
-Laqu=xq-xl;
-Lads=Ksat*Ladu;
-Laqs=Ksat*Laqu;
-Lfd= ((xpd-xl)*Ladu)/(Ladu-(xpd-xl));
-Ks=(Eb*Eqo)/(xd+xe)*cos(tho);
-K1=Eb*eqo/D*(RT*sin(do)+XTD*cos(do))+Eb*iqo/D*(xq-xpd)*(XTQ*sin(do)-RT*cos(do));
-K2=Lads/(Lads+Lfd)*(RT/D*eqo+(XTQ*(xq-xpd)/D+1)*iqo);
+efdo=Ladu*ifdo;
 
 
-K3=(Lads+Lfd)/Ladu*1/(1+XTQ/D*(xd+xpd));
-K4=Eb/D*(xd-xpd)*(XTQ*sin(do)-RT*cos(do));
-K5=-(vdo/Et)*xq*Eb*cos(do)/(xe+xq)-(vqo/Et)*xpd*Eb*sin(do)/(xe+xpd);
-K6=xe*(vqo/Et)/(xe+xpd);
-K7=K2/K6;
+
+K1=(xq-xpd)/(xe+xpd)*iqo*Eb*sin(do)+eqo*Eb*cos(do)/(xe+xq);
+K2=Eb*sin(do)/(xe+xpd);
+K3=(xpd+xe)/(xd+xe);
+K4=(xd-xpd)/(xe+xpd)*Eb*sin(do);
+K5=xq/(xe+xq)*edo/Et*Eb*cos(do)-xpd/(xe+xpd)*eqo/Et*Eb*sin(do);
+
+K6=xe/(xe+xpd)*eqo/Et;
+
 
 
 T3=K3*tpdo;
@@ -80,10 +83,10 @@ T3=K3*tpdo;
 Tr=0.01;
 
 % excitatriz
-KA=1000;
+KA=10;
 TA=0.1;
-T1a=100;
-T2a=100;
+T1a=0;
+T2a=0;
 Tee=0.1;
 
 parte3_eje1_SMIB_Exc
