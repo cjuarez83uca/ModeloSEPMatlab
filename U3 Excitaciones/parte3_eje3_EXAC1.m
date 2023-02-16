@@ -19,6 +19,6 @@ AEX=0.1;
 BEX=0.03;
 
 Vrefin=1;
-IFDfin=1000;
-parte3_eje4_avr_exac1
-sim('parte3_eje4_avr_exac1')
+IFDfin=1;
+% parte3_eje4_avr_exac1
+% sim('parte3_eje4_avr_exac1')
