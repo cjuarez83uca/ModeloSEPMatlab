@@ -55,7 +55,6 @@ switch flag
 
   fcall(Syn)
   Exc = fcall(Exc);
-  Pss = fcall(Pss);
 
  case '1r'
 
@@ -65,7 +64,6 @@ switch flag
   gcall(Pl)
   Syn = gcall(Syn);
   gcall(Exc)
-  gcall(Pss)
   PV = gcall(PV);
   SW = gcall(SW);
   gisland(Bus)
@@ -82,14 +80,12 @@ switch flag
   DAE.Gx = sparse(DAE.m,DAE.n);
   Fxcall(Syn)
   Fxcall(Exc)
-  Fxcall(Pss)
 
  case '0'
 
   Pl = setx0(Pl);
   Syn = setx0(Syn);
   Exc = setx0(Exc);
-  Pss = setx0(Pss);
 
  case 'fdpf'
 
@@ -134,7 +130,6 @@ switch flag
   gcall(Pl)
   Syn = gcall(Syn);
   gcall(Exc)
-  gcall(Pss)
   gisland(Bus)
   Gycall(Line)
   Gycall(PQ)
@@ -142,20 +137,17 @@ switch flag
   Gycall(Pl)
   Syn = Gycall(Syn);
   Gycall(Exc)
-  Gycall(Pss)
   Gyisland(Bus)
 
 
   fcall(Syn)
   Exc = fcall(Exc);
-  Pss = fcall(Pss);
 
   DAE.Fx = sparse(DAE.n,DAE.n);
   DAE.Fy = sparse(DAE.n,DAE.m);
   DAE.Gx = sparse(DAE.m,DAE.n);
   Fxcall(Syn)
   Fxcall(Exc)
-  Fxcall(Pss)
 
  case 'kgpf'
 
@@ -190,7 +182,6 @@ switch flag
   gcall(Pl)
   Syn = gcall(Syn);
   gcall(Exc)
-  gcall(Pss)
   PV = gcall(PV);
   SW = gcall(SW);
   gisland(Bus)
@@ -200,7 +191,6 @@ switch flag
   Gycall(Pl)
   Syn = Gycall(Syn);
   Gycall(Exc)
-  Gycall(Pss)
   Gycall(PV)
   Gycall(SW)
   Gyisland(Bus)
@@ -214,7 +204,6 @@ switch flag
   gcall(Pl)
   Syn = gcall(Syn);
   gcall(Exc)
-  gcall(Pss)
   PV = gcall(PV);
   SW = gcall(SW);
   gisland(Bus)
@@ -224,7 +213,6 @@ switch flag
   Gycall(Pl)
   Syn = Gycall(Syn);
   Gycall(Exc)
-  Gycall(Pss)
   Gycall(PV)
   Gycall(SW)
   Gyisland(Bus)
@@ -232,7 +220,6 @@ switch flag
 
   fcall(Syn)
   Exc = fcall(Exc);
-  Pss = fcall(Pss);
 
   if DAE.n > 0
   DAE.Fx = sparse(DAE.n,DAE.n);
@@ -242,13 +229,11 @@ switch flag
 
   Fxcall(Syn)
   Fxcall(Exc)
-  Fxcall(Pss)
   Fxcall(PV)
   Fxcall(SW)
 
  case '5'
 
   windup(Exc)
-  windup(Pss)
 
 end

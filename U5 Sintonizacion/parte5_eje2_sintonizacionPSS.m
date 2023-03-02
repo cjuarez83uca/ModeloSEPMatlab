@@ -121,57 +121,25 @@ Q=Bus.Qg(N_Gen);
 
 xe=1; % reactancia externa
 
-Et=1; % voltaje en terminales.
-Eb=0.995; % tensión en barra infinita.
+vto=1.03; % voltaje en terminales.
+eb=1; % tensión en barra infinita.
 
-tho= asin(P*xe/(Eb*Et));% angulo de desfase entre Eb y Et
-
-%Estado de operación
-Vto=Et*(cos(tho)+1i*sin(tho)); % tensión en terminales (compleja)
-
-Ia=(P-1i*Q)/(conj(Vto)); % Corriente armadura (compleja)
-ia=abs(Ia); % Imax
-fio=angle(Ia);% desfase
-
-Eqo=Vto+(ra+xq*1i)*Ia; % tensión en cudratura del generador.
-eqo=abs(Eqo); % eq
-do=angle(Eqo); % desfase
-
-ido=-ia*sin(do-fio);  % id
-iqo=ia*cos(do-fio); % iq
-
-efdo=eqo-(xd-xq)*ido; % tensión de campo
-
-vqo=Eb*cos(do)+ra*iqo-xe*ido; %vq terminales
-vdo=ra*iqo+xe*iqo-Eb*sin(do); %vd terminales
-
-wb=2*pi*F; % frecuencia base.
-
+tho=asin(P*xe/(eb*vto));%Ver ecuacion 12.70 (Kundur, pagina 729)corresponde a delta en dicha figura
+Vto=vto*(cos(tho)+i*sin(tho));Ia=(P-i*Q)/(conj(Vto));ia=abs(Ia);fio=angle(Ia);
+Eqo=Vto+(ra+xq*i)*Ia; eqo=abs(Eqo); do=angle(Eqo);
+ido=-ia*sin(do-fio); iqo=ia*cos(do-fio);
+efdo=eqo-(xd-xq)*ido; vqo=eb*cos(do)+ra*iqo-xe*ido; vdo=ra*iqo+xe*iqo-eb*sin(do);%Tiene signos cambiados respecto a la formula del Kundur (Pagina 747)
+%Por eso el signo en k5 tambien se modifica respecto al del paper concepts
+%of Synchronous Machine Stability as affected by Excitation Control
+wb=2*pi*F;
 % Calculo de k1 a k6
-RT=ra;
-XTQ=xe+xq;
-XTD=xe+xpd;
-D=RT^2+XTQ*XTD;
-Ksat=0.83;
-Ladu=xd-xl;
-Laqu=xq-xl;
-Lads=Ksat*Ladu;
-Laqs=Ksat*Laqu;
-Lfd= ((xpd-xl)*Ladu)/(Ladu-(xpd-xl));
-Ks=(Eb*Eqo)/(xd+xe)*cos(tho);
-K1=Eb*eqo/D*(RT*sin(do)+XTD*cos(do))+Eb*iqo/D*(xq-xpd)*(XTQ*sin(do)-RT*cos(do));
-K2=Lads/(Lads+Lfd)*(RT/D*eqo+(XTQ*(xq-xpd)/D+1)*iqo);
-
-
-K3=(Lads+Lfd)/Ladu*1/(1+XTQ/D*(xd+xpd));
-K4=Eb/D*(xd-xpd)*(XTQ*sin(do)-RT*cos(do));
-K5=-(vdo/Et)*xq*Eb*cos(do)/(xe+xq)-(vqo/Et)*xpd*Eb*sin(do)/(xe+xpd);
-K6=xe*(vqo/Et)/(xe+xpd);
-
-
-
-T3=K3*tpdo;
-
+K1=((xq-xpd)/(xe+xpd))*iqo*eb*sin(do)+eqo*eb*cos(do)/(xe+xq);
+K2=eb*sin(do)/(xe+xpd);
+K3=(xe+xpd)/(xd+xe);
+K4=(xd-xpd)*sin(do)*eb/(xpd+xe);
+K5=-(vdo/vto)*xq*eb*cos(do)/(xe+xq)-(vqo/vto)*xpd*eb*sin(do)/(xe+xpd);
+K6=xe*(vqo/vto)/(xe+xpd);
+T3=tpdo*K3;
 
 
 
@@ -194,13 +162,13 @@ w_loc=2*pi*freqor(mx_idx(2));
 [mag_loc,fase_loc]=bode(sysGEP,w_loc);
 
 % Compensadores
-T1=0.3;
-T2=0.03;
-T3=0.3;
-T4=0.03;
+T1pss=0.3;
+T2pss=0.03;
+T3pss=0.3;
+T4pss=0.03;
 
 % Función de transferencia del compensador
-sysPSS=tf([T1 1],[T2 1])*tf([T3 1],[T4 1]);
+sysPSS=tf([T1pss 1],[T2pss 1])*tf([T3pss 1],[T4pss 1]);
 
 % Función GPSSGEP
 sys=sysGEP*sysPSS;
